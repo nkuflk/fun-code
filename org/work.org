@@ -1,0 +1,16 @@
+#+STARTUP: showall indent
+
+* 2015
+** 05
+*** 08
+**** TODO 找吕飞配置ae-realtime发布脚本
+SCHEDULED: <2015-05-08 Fri>
+**** DONE(D@)3 手机充值bops功能测试完成
+CLOSED: [2015-05-08 Fri 14:52] SCHEDULED: <2015-05-08 Fri>
+**** DONE(D@)3 手机充值bops进入待发布
+CLOSED: [2015-05-08 Fri 15:01] SCHEDULED: <2015-05-08 Fri>
+*** 09
+*** 10
+*** 11
+*** 12
+*** 13
