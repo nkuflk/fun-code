@@ -9,7 +9,7 @@
 def main():
     online = open('online', 'r')
     for line in online:
-        print line,
+        print line
     online.close()
 
 if __name__ == '__main__':
