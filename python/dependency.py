@@ -33,7 +33,7 @@ def write(group, arti, ver, f):
 	f.write('<version>')
 	temp = ''
 	if type(ver) == str:
-		temp = ver 
+		temp = ver
 	else:
 		for v in ver:
 			temp = temp + v + '-'
