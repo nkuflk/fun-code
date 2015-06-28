@@ -98,21 +98,21 @@ def writeDependency():
 
 
 def handle(path):
-    print '--------------------------------------'
+    print '-------------------------------------'
     print 'getting useful pom.xml...'
     file = findUsefulPom(path)
     print 'get pom.xml success!'
     for line in file:
         print line
-    print '--------------------------------------'
+    print '-------------------------------------'
     print 'generating dependencies...'
     getDependency(file)
     print 'generate dependencies success!'
-    print '--------------------------------------'
+    print '-------------------------------------'
     print 'writng dependency.xml...'
     writeDependency()
     print 'write to dependency.xml success!'
-    print '--------------------------------------'
+    print '-------------------------------------'
 
 
 if __name__=='__main__':
