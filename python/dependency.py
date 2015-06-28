@@ -1,92 +1,126 @@
-#!/usr/bin/python
-#-*- coding:utf-8 -*-
+#!/usr/bin/env python
+# encoding: utf-8
+
 #########################################
 # File Name: dependency.py
-# Author: F.L.K
-# Mail: nkuflk@gmail.com
+# Author: yuntao.hyt
+# Mail: yuntao.hyt@alibaba-inc.com
+# Created Time: 2015-06-26 17:29:50
 #########################################
 
-import re
+import sys
+import os
+import xml.etree.ElementTree as ET
 import urllib
 
-split_reg = '-'
-url_head = 'http://repo.alibaba-inc.com/nexus/content/groups/b2brepository/'
+dependencyList = []
+used = {}
+url_head = 'http://repo.alibaba-inc.com/nexus/content/groups/b2bnewrepos'
 
-def get_name(name):
-	return name[0 : len(name)-5]
 
-def write(group, arti, ver, f):
-	f.write('<dependency>\n')
-	f.write('<groupId>')
-	f.write(group)
-	f.write('</groupId>\n')
-	f.write('<artifactId>')
-	temp = ''
-	if type(arti) == str:
-		temp = arti
-	else:
-		for ar in arti:
-			temp = temp + ar + '-'
-		temp = temp[0 : -1]
-	f.write(temp)
-	f.write('</artifactId>\n')
-	f.write('<version>')
-	temp = ''
-	if type(ver) == str:
-		temp = ver
-	else:
-		for v in ver:
-			temp = temp + v + '-'
-		temp = temp[0 : -1]
-	f.write(temp)
-	f.write('</version>\n')
-	f.write('</dependency>\n')
+class Item(object):
 
-def test_url(name, f):
-	res = name.split(split_reg)
-	url = url_head
-	group_id = ''
-	if res[0] == 'commons':
-		url = url + res[0] + '-' + res[1] + '/'
-		group_id = res[0] + '-' + res[1]
-		del res[1]
-	else:
-		group_res = res[0].split('.')
-		group_id = res[0]
-		for group in group_res:
-			url = url + group + '/'
-	if len(res) == 3:
-		url = url + res[1] + '/' + res[2]
-		if urllib.urlopen(url).getcode() != 200:
-			print name
-		else:
-			write(group_id, res[1], res[2], f)
-	else:
-		if re.match(r'^[0-9\.]+$', res[-2]) and re.match(r'^[0-9a-zA-Z]+$', res[-1]):
-			for art in res[1 : -2]:
-				url = url + art + '-'
-			url = url[0 : -1] + '/' +  res[-2] + '-' + res[-1]
-			if urllib.urlopen(url).getcode() != 200:
-				print name
-			else:
-				write(group_id, res[1 : -2], res[-2 :], f)
-		else:
-			for art in res[1 : -1]:
-				url = url + art + '-'
-			url = url[0 : -1] + '/' +  res[-1]
-			if urllib.urlopen(url).getcode() != 200:
-				print name
-			else:
-				write(group_id, res[1 : -1], res[-1], f)
+    def __init__(self, groupId, artifactId, version):
+        self.groupId = groupId
+        self.artifactId = artifactId
+        self.version = version
 
-def main():
-	online = open('online', 'r')
-	dependency = open('dependency.xml', 'w')
-	for line in online:
-		line = get_name(line)
-		has = test_url(line, dependency)
-	online.close()
-	dependency.close()
 
-if __name__ == '__main__':
-    main()
+def findUsefulPom(path):
+    files = []
+    for root, name, file in os.walk(path):
+        if 'pom.xml' in file:
+            files.append(os.path.join(root, 'pom.xml'))
+    res = []
+    for f in files:
+        xmlDoc = ET.parse(f)
+        xmlRoot = xmlDoc.getroot()
+        value = xmlRoot.find('{http://maven.apache.org/POM/4.0.0}packaging').text
+        if value == 'war':
+            res.append(f)
+    return res
+
+
+def analyzePom(pom):
+    print 'analyzing ' + pom
+    file = open('list', 'r')
+    pomLen = 0
+    for depend in file:
+        if depend.find('jar') < 0:
+            continue
+        pomLen += 1
+    file.seek(0)
+    curLen = 0
+    for depend in file:
+        if depend.find('jar') < 0:
+            continue
+        curLen += 1
+        line = depend.split(' ')[4].split(':')
+        url = url_head
+        for x in line[0].split('.'):
+            url = url + '/' + x
+        url = url + '/' + line[1] + '/' + line[3]
+        if used.has_key('url'):
+            continue
+        used[url] = 1
+        if urllib.urlopen(url).getcode() != 200:
+            print '\nsorry, this may be analyzed manually'
+            print depend
+        else:
+            item = Item(line[0], line[1], line[3])
+            dependencyList.append(item)
+        x = curLen * 100.0 / pomLen
+        sys.stdout.write('\ranalyzign %6.2f' % x + '%')
+        sys.stdout.flush()
+    file.close()
+    print '\nanalyze ' + pom + ' success!'
+
+
+def getDependency(pom):
+    for file in pom:
+        os.system('mvn -f ' + file + ' dependency:list > list')
+        analyzePom(file)
+
+
+def writeDependency():
+    file = open('dependency.xml', 'w')
+    file.write('<dependencyManagement>\n\t<dependencies>\n')
+    for item in dependencyList:
+        file.write('\t\t<dependency>\n\t\t\t<groupId>')
+        file.write(item.groupId)
+        file.write('</groupId>\n\t\t\t<artifactId>')
+        file.write(item.artifactId)
+        file.write('</artifactId>\n\t\t\t<version>')
+        file.write(item.version)
+        file.write('</version>\n\t\t</dependency>\n')
+    file.write('\t</dependencies>\n</dependencyManagement>\n')
+    file.close()
+
+
+def handle(path):
+    print '--------------------------------------'
+    print 'getting useful pom.xml...'
+    file = findUsefulPom(path)
+    print 'get pom.xml success!'
+    for line in file:
+        print line
+    print '--------------------------------------'
+    print 'generating dependencies...'
+    getDependency(file)
+    print 'generate dependencies success!'
+    print '--------------------------------------'
+    print 'writng dependency.xml...'
+    writeDependency()
+    print 'write to dependency.xml success!'
+    print '--------------------------------------'
+
+
+if __name__=='__main__':
+    try:
+        path = sys.argv[1]
+        if os.path.isdir(path):
+            handle(path)
+        else:
+            print '"' + path + '" is not a dir'
+    except IndexError:
+        print 'usage: python dependency.py [path]'
