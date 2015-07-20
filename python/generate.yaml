@@ -1,0 +1,52 @@
+# two party libraries in trade
+trade:
+    tp:
+        - canary
+        - client 
+        - exchangerate-client
+        - exchangerate-share
+        - extern-search
+        - gregdegree
+        - searchclient
+        - searchengineclient
+        - share
+        - signature
+        - statistics
+        - utils
+        - viewtool
+        - extern-fileserver
+        - extern-http
+        - extern-logisitcs
+        - extern-member
+        - extern-promotion
+        - extern-punish
+        - extern-recharge
+        - extern-stock
+    modules:
+        - archive-datasource
+        - archive-dhmapping
+        - archive-task
+        - base-hbasedatasource
+        - base-tradepartition
+        - business
+        - common
+        - component-base-attachment
+        - component-base-operationlog
+        - component-base-orderflowdefine
+        - component-base-parameters
+        - component-base-task
+        - component-base-timeout
+        - component-base-uri
+        - component-customerservice
+        - component-deposit
+        - component-fund
+        - component-issue
+        - component-logistics
+        - component-mailingaddress
+        - component-msg
+        - component-order
+        - component-orderexport
+        - component-ruleengine
+        - component-snapshot
+        - component-taskpool
+        - component-transactionrelation
