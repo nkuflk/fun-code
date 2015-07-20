@@ -18,6 +18,7 @@ used = {}
 url_head = 'http://repo.alibaba-inc.com/nexus/content/groups/b2bnewrepos'
 
 
+# dependency class
 class Item(object):
 
     def __init__(self, groupId, artifactId, version):
@@ -26,6 +27,8 @@ class Item(object):
         self.version = version
 
 
+# find pom which packaging is war
+# mvn dependency:list just can analyze to war level
 def findUsefulPom(path):
     files = []
     for root, name, file in os.walk(path):
@@ -41,6 +44,7 @@ def findUsefulPom(path):
     return res
 
 
+# get dependency and request maven repo to check exist
 def analyzePom(pom):
     print 'analyzing ' + pom
     file = open('list', 'r')
@@ -82,6 +86,7 @@ def getDependency(pom):
         analyzePom(file)
 
 
+# generate dependencyManagement
 def writeDependency():
     file = open('dependency.xml', 'w')
     file.write('<dependencyManagement>\n\t<dependencies>\n')
