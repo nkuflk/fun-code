@@ -21,6 +21,7 @@ from Cheetah.Template import Template
 url_head = 'http://repo.alibaba-inc.com/nexus/content/groups/b2bnewrepos'
 
 
+# dependency in old pom
 class Lib(object):
 
     def __init__(self):
@@ -31,6 +32,7 @@ class Lib(object):
         self.exclusions = []
 
 
+# get intl base version and other dependency
 def getVersion(lst, path):
     os.system('mvn -f ' + path + ' dependency:list > list')
     file = open('list', 'r')
@@ -64,6 +66,8 @@ def getVersion(lst, path):
     file.close()
     return list(dep.values())
 
+
+# generate new pom
 def generatePom(pos, path):
     project = Lib()
     project.groupId = 'com.aliexpress.trade.open'
@@ -117,6 +121,7 @@ def generatePom(pos, path):
     print 'generate pom for  ' + project.name + '  success!'
 
 
+# copy src dir to new lib
 def copySrc(path):
     src = '../' + path + '/src'
     dst = path + '/src'
@@ -130,6 +135,7 @@ def copySrc(path):
         print src + ' not exists!'
 
 
+# cerate new lib dir
 def createDir():
     stream = open('generate.yaml', 'r')
     
