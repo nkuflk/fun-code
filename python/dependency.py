@@ -39,7 +39,7 @@ def findUsefulPom(path):
         xmlDoc = ET.parse(f)
         xmlRoot = xmlDoc.getroot()
         value = xmlRoot.find('{http://maven.apache.org/POM/4.0.0}packaging').text
-        if value == 'war':
+        if value in ['war', 'ali-war']:
             res.append(f)
     return res
 
