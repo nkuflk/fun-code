@@ -20,7 +20,7 @@ class Solution {
 			}
 
 			i = 0, j = 0;
-			while (i != string::npos && j != string::npos) {
+			while (i != string::npos and j != string::npos) {
 				j = s.find_first_of(whitespace, i);
 				j == string::npos ? reverse(next(s.begin(), i), s.end()) : reverse(next(s.begin(), i), next(s.begin(), j));
 				i = s.find_first_not_of(whitespace, j);

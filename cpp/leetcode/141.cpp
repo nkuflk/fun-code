@@ -9,7 +9,7 @@ struct ListNode {
 class Solution {
 public:
     bool hasCycle(ListNode *head) {
-		while (head && head->next) {
+		while (head and head->next) {
 			if (head == head->next->next) return true;
 			head->next = head->next->next;
 			head = head->next;

@@ -56,7 +56,7 @@ public:
 		calheight(r, sa, 2*n+1);
 		int len=0, start=0;
 		for (int i=1; i<2*n+2; ++i) {
-			if(height[i] > len && (sa[i-1] < n) ^ (sa[i] < n)){
+			if(height[i] > len and (sa[i-1] < n) ^ (sa[i] < n)){
 				len = height[i];
 				start = sa[i];
 			}
